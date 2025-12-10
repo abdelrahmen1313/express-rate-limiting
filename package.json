@@ -1,0 +1,19 @@
+{
+  "name": "express-rate-limiter-module",
+  "version": "1.0.0",
+  "description": "Production-ready rate limiter middleware for Express.js",
+  "private": false,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+ 
+    "compile": "tsc",
+    "compile:watch": "tsc --watch"
+  },
+  "dependencies": {
+   
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}
