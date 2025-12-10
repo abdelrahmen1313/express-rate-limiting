@@ -50,9 +50,9 @@ export function createRateLimiterMiddleware(config: MiddlewareOptions): RateLimi
     const { status } = rateLimiter.checkRateLimit(clientIp)
 
     // Set rate limit headers for client awareness
-    res.setHeader("X-RateLimit-Limit", config.maxRequests)
-    res.setHeader("X-RateLimit-Remaining", status.remaining)
-    res.setHeader("X-RateLimit-Reset", Math.ceil(status.resetAt / 1000))
+   // res.setHeader("X-RateLimit-Limit", config.maxRequests)
+   // res.setHeader("X-RateLimit-Remaining", status.remaining)
+   // res.setHeader("X-RateLimit-Reset", Math.ceil(status.resetAt / 1000))
 
     if (!status.allowed) {
       return res.status(429).json({
@@ -61,7 +61,7 @@ export function createRateLimiterMiddleware(config: MiddlewareOptions): RateLimi
       })
     }
     // Attach rate limit info to request for downstream handlers
-    ;(req as any).rateLimit = {
+    ;(req).rateLimit = {
       remaining: status.remaining,
       resetAt: status.resetAt,
     }
