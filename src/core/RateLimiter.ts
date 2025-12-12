@@ -39,6 +39,7 @@ export class RateLimiter {
       snapshot = new ClientSnapshot(clientIp, this.maxRequests)
     } else if (existingSnapshot.isWindowExpired(this.windowInMinutes)) {
       // Window expired, reset
+      this.resetClient(clientIp)
       snapshot = new ClientSnapshot(clientIp, this.maxRequests)
     } else {
       // Window active, increment hits
@@ -138,4 +139,6 @@ export class RateLimiter {
   getClientCount(): number {
     return this.clientSnapshots.size
   }
+
+
 }

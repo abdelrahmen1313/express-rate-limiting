@@ -6,8 +6,7 @@
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "publishConfig": {
-        "access": "public",
-        "registry": "https://npm.pkg.github.com"
+        "access": "public"
     },
     "scripts": {
         "compile": "tsc -p tsconfig.build.json",

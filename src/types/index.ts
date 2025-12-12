@@ -1,4 +1,5 @@
 import type { Request, Response, NextFunction } from "express"
+import { ClientSnapshot } from "../core/ClientSnapshot"
 
 /**
  * Represents a snapshot of a client's rate limiting state
@@ -58,6 +59,10 @@ declare global {
       rateLimit?: {
         remaining: number;
         resetAt: number;
+      },
+      rateLimitInfos?: {
+        activeUsers : ClientSnapshot[];
+        clientsCount : number
       };
     }
   }
