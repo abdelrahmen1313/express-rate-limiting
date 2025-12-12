@@ -73,7 +73,7 @@ export function createRateLimiterMiddleware(config: MiddlewareOptions): RateLimi
       remaining: status.remaining,
       resetAt: status.resetAt,
     };
-    (req as any).rateLimitInfos = {
+    req.rateLimitInfos = {
      activeUsers : activeUsers,
      clientsCount : ClientsCount
     }
