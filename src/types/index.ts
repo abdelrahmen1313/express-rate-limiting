@@ -26,6 +26,8 @@ export interface RateLimiterConfig {
   enableCleanup?: boolean
   /** Interval for cleanup in minutes (default: 5) */
   cleanupIntervalMinutes?: number
+  /** Control if the api should send X-RATE-LIMIT HEADERS (dafault : true) */
+  showInformativeHeaders?: boolean
 }
 
 /**

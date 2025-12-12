@@ -6,12 +6,11 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
- 
     "compile": "tsc",
     "compile:watch": "tsc --watch"
   },
   "dependencies": {
-   
+    "@types/express": "^5.0.6"
   },
   "devDependencies": {
     "typescript": "^5"
