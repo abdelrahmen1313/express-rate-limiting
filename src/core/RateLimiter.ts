@@ -8,7 +8,7 @@ export class RateLimiter {
   private clientSnapshots: Map<string, ClientSnapshot>
   private readonly maxRequests: number
   private readonly windowInMinutes: number
-  private cleanupInterval: NodeJS.Timeout | null = null
+  private cleanupInterval: ReturnType <typeof setInterval> | null = null
 
 
   constructor(config: RateLimiterConfig) {
@@ -122,12 +122,10 @@ export class RateLimiter {
    * Remove expired entries from the map
    */
   private cleanup(): void {
-    let removedCount = 0
 
     for (const [ip, snapshot] of this.clientSnapshots.entries()) {
       if (snapshot.isWindowExpired(this.windowInMinutes)) {
         this.clientSnapshots.delete(ip)
-        removedCount++
       }
     }
 

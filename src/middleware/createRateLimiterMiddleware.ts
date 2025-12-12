@@ -33,6 +33,7 @@ export function createRateLimiterMiddleware(config: MiddlewareOptions): RateLimi
 
   const getClientIp = config.getClientIp || defaultGetClientIp
   const errorMessage = config.errorMessage || "Too many requests, please try again later"
+  const showInformativeHeaders = config.showInformativeHeaders || true
 
   return (req: Request, res: Response, next: NextFunction): void => {
     // Check if this request should skip rate limiting
@@ -44,27 +45,29 @@ export function createRateLimiterMiddleware(config: MiddlewareOptions): RateLimi
 
     if (!clientIp) {
       console.warn("[RateLimiter] Could not determine client IP")
-      return next()
+      res.status(500).end();
+      return;
     }
 
     const { status } = rateLimiter.checkRateLimit(clientIp)
 
     // Set rate limit headers for client awareness
-    if (config.showInformativeHeaders) {
-    res.setHeader("X-RateLimit-Limit", config.maxRequests)
-    res.setHeader("X-RateLimit-Remaining", status.remaining)
-    res.setHeader("X-RateLimit-Reset", Math.ceil(status.resetAt / 1000))
+    if (showInformativeHeaders) {
+      res.setHeader("X-RateLimit-Limit", config.maxRequests)
+      res.setHeader("X-RateLimit-Remaining", status.remaining)
+      res.setHeader("X-RateLimit-Reset", Math.ceil(status.resetAt / 1000))
     } 
 
 
     if (!status.allowed) {
-      return (res as any).status(429).json({
+       res.status(429).json({
         error: errorMessage,
         retryAfter: Math.ceil((status.resetAt - Date.now()) / 1000),
       })
+      return;
     }
     // Attach rate limit info to request for downstream handlers
-    ; (req as any).rateLimit = {
+    ; req.rateLimit = {
       remaining: status.remaining,
       resetAt: status.resetAt,
     }

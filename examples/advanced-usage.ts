@@ -19,8 +19,8 @@ const rateLimiter = createRateLimiterMiddleware({
     return (
       (req.headers["cf-connecting-ip"] as string) || // Cloudflare
       (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
-      req.socket?.remoteAddress || req.ip ||
-      "unknown"
+      req.socket?.remoteAddress || req.ip || "unknown"
+     // the middleware will automatically handle the "unknown" exception
     )
   },
 
@@ -29,7 +29,7 @@ const rateLimiter = createRateLimiterMiddleware({
     return req.path === "/health" || req.path === "/metrics"
   },
 
-  // Cleanup expired records every 10 minutes
+  // Cleanup expired records every 10 minutes -- default is 90
   cleanupIntervalMinutes: 10,
 })
 

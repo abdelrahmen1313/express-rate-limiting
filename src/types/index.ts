@@ -26,7 +26,7 @@ export interface RateLimiterConfig {
   enableCleanup?: boolean
   /** Interval for cleanup in minutes (default: 5) */
   cleanupIntervalMinutes?: number
-  /** Control if the api should send X-RATE-LIMIT HEADERS (dafault : true) */
+  /** Control if the api should send X-RATE-LIMIT HEADERS (default : true) */
   showInformativeHeaders?: boolean
 }
 
@@ -50,4 +50,15 @@ export type RateLimitMiddleware = (req: Request, res: Response, next: NextFuncti
 export interface MiddlewareOptions extends RateLimiterConfig {
   /** Function to determine if a request should skip rate limiting */
   skip?: (req: Request) => boolean
+}
+
+declare global {
+  namespace Express {
+    interface Request {
+      rateLimit?: {
+        remaining: number;
+        resetAt: number;
+      };
+    }
+  }
 }
