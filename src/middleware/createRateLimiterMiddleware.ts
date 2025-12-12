@@ -33,7 +33,7 @@ export function createRateLimiterMiddleware(config: MiddlewareOptions): RateLimi
 
   const getClientIp = config.getClientIp || defaultGetClientIp
   const errorMessage = config.errorMessage || "Too many requests, please try again later"
-  const showInformativeHeaders = config.showInformativeHeaders || true
+  const showInformativeHeaders = config.showInformativeHeaders ?? true
 
   return (req: Request, res: Response, next: NextFunction): void => {
     // Check if this request should skip rate limiting

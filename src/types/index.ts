@@ -19,7 +19,7 @@ export interface RateLimiterConfig {
   /** Time window in minutes (default: 1) */
   windowInMinutes?: number
   /** Custom function to extract IP from request (default: uses req.ip) */
-  getClientIp?: (req: Request) => string
+  getClientIp?: (req: Request) => string | undefined
   /** Custom error message (default: "Too many requests, please try again later") */
   errorMessage?: string
   /** Whether to clean up stale entries periodically (default: true) */

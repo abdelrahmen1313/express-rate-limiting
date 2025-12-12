@@ -17,7 +17,7 @@ export class RateLimiter {
     this.clientSnapshots = new Map()
 
     if (config.enableCleanup ?? true) {
-      this.startCleanup(config.cleanupIntervalMinutes ?? 5)
+      this.startCleanup(config.cleanupIntervalMinutes ?? 90)
     }
  
   }
