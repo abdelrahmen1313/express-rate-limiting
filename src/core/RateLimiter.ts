@@ -10,16 +10,24 @@ export class RateLimiter {
   private readonly windowInMinutes: number
   private cleanupInterval: ReturnType <typeof setInterval> | null = null
 
+  private maxClients : number
 
   constructor(config: RateLimiterConfig) {
     this.maxRequests = config.maxRequests
     this.windowInMinutes = config.windowInMinutes ?? 1
     this.clientSnapshots = new Map()
-
+    this.maxClients = config.maxClients ?? 9999
     if (config.enableCleanup ?? true) {
       this.startCleanup(config.cleanupIntervalMinutes ?? 90)
     }
  
+  }
+
+  /**
+   * check if number of active users is above maxClients
+   */
+  flagUserOverload() {
+    return this.getClientCount() > 9999
   }
 
   /**

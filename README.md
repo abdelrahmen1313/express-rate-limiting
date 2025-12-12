@@ -5,20 +5,35 @@ A production - ready, type - safe rate limiter middleware for Express.js applica
 ## Features
 
 - ✅ **Type - Safe**
+
   -Full TypeScript support with comprehensive types
+
 - ✅ **Lightweight**
+
   -Minimal dependencies, only requires Express
+
 - ✅ **Flexible**
+
   -Configurable time windows and request limits
+
 - ✅ **Memory Efficient**
+
   -Automatic cleanup of expired entries
+
 - ✅ **Proxy Support**
+
   -Handles `X-Forwarded-For` headers and custom IP extraction
+
 - ✅ **Standards Compliant**
+
   -Returns standard rate limit headers(`X-RateLimit-*`)
+
 - ✅ **Per - Route Control**
+
   -Apply to specific routes or globally
+
 - ✅ **Observable**
+
   -Access rate limit status in downstream handlers
 
 ## Installation
@@ -58,8 +73,9 @@ app.listen(3000);
   maxRequests: number;             # Max requests per window (required)
   windowInMinutes?: number;        # Time window in minutes (default: 1)
   enableCleanup?: boolean;         # Enable automatic cleanup (default: true)
-  cleanupIntervalMinutes?: number  # Cleanup interval (default: 90)
+  cleanupIntervalMinutes?: number  # Cleanup interval in minutes (default: 90)
   showInformativeHeaders?: boolean #  Control if the api should send X-RATE-LIMIT HEADERS (default : true)
+  maxClients?: number              # Maximum clients allowed per route  (default : 9999) 
 
 ```
 
@@ -108,6 +124,8 @@ const apiLimiter = createRateLimiterMiddleware({maxRequests: 50, windowInMinutes
 
 const authLimiter = createRateLimiterMiddleware({maxRequests: 5, windowInMinutes: 15});
 
+const pastaServiceLimiter = createRateLimiterMiddleware({maxRequests: 5, windowInMinutes: 10, maxClients : 100});
+
 app.use('/api', apiLimiter);
 app.post('/auth/login', authLimiter, (req, res) => {
     // Handle login
@@ -137,14 +155,7 @@ req.rateLimit = {
 };
 
 req.rateLimitInfos = {
-    "activeUsers": [
-        {
-            "clientIpAddress": "::1",
-            "timestamp": 1765579576661,
-            "hits": 1,
-            "maxHits": 3
-        }
-    ],
+    
     "clientsCount": 1
 }
 
@@ -172,18 +183,11 @@ X - RateLimit - Reset : 1702123456
 4. **Check limit** - Compares hits against maxRequests
 5. **Response** - Returns 429 if limited, otherwise adds headers and continues
 
-### Window Behavior
-
-- When a client first makes a request, a **time window starts**
-- All requests within that window **share the same counter**
-- Once the window expires (time elapsed ≥ windowInMinutes), **counter resets**
-- The **exact time window** for each client is tracked individually
-
 ## Memory Management
 
 The middleware automatically cleans up expired entries:
 
-- Cleanup runs every 5 minutes by default (configurable)
+- Cleanup runs every 90 minutes by default (configurable)
 - Only expired snapshots are removed
 - Can be disabled with ` enableCleanup : false ` if managing memory differently
 
