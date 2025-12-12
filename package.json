@@ -6,7 +6,8 @@
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "publishConfig": {
-        "access": "public"
+        "access": "public",
+        "registry": "https://npm.pkg.github.com"
     },
     "scripts": {
         "compile": "tsc -p tsconfig.build.json",
@@ -20,6 +21,7 @@
     "peerDependencies": {
         "express": ">=4"
     },
+    "repository": "https://github.com/abdelrahmen1313/express-rate-limiting",
     "devDependencies": {
         "typescript": "^5",
         "@types/express": "^5.0.6",
