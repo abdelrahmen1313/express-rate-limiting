@@ -16,7 +16,7 @@ A production-ready, type-safe rate limiter middleware for Express.js application
 ## Installation
 
 \`\`\`bash
-npm install @yourorg/express-rate-limiter
+npm install @edah/express-rate-limiting
 \`\`\`
 
 ## Quick Start
@@ -194,14 +194,14 @@ The middleware automatically cleans up expired entries:
 ## Monitoring
 
 Get active clients and statistics:
-
+npm install express-rate-limiting
 \`\`\`typescript
 import { RateLimiter } from '@yourorg/express-rate-limiter';
 
 const limiter = new RateLimiter({
   maxRequests: 100,
   windowInMinutes: 15,
-});
+import { createRateLimiterMiddleware } from 'express-rate-limiting';
 
 const activeClients = limiter.getActiveClients();
 const clientCount = limiter.getClientCount();
@@ -216,7 +216,7 @@ console.log(`Active clients: ${clientCount}`);
 - **Automatic cleanup** - Prevents unbounded memory growth
 - **No external dependencies** - Only requires Express
 
-## Production Checklist
+import { RateLimiter } from 'express-rate-limiting';
 
 - [ ] Choose appropriate `maxRequests` and `windowInMinutes` for your API
 - [ ] Configure `getClientIp` for your infrastructure (cloud provider, proxy setup)

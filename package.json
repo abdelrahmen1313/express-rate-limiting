@@ -1,19 +1,27 @@
 {
-  "name": "express-rate-limiter-module",
-  "version": "1.0.0",
+  "name": "@edah/express-rate-limiting",
+  "version": "0.1.0",
   "description": "Production-ready rate limiter middleware for Express.js",
   "private": false,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "publishConfig": { "access": "public"},
   "scripts": {
-    "compile": "tsc",
-    "compile:watch": "tsc --watch"
+    "compile": "tsc -p tsconfig.build.json",
+    "compile:watch": "tsc --watch -p tsconfig.build.json",
+    "prepare": "npm run compile",
+    "prepublishOnly": "npm run compile"
   },
-  "dependencies": {
+  "files": ["dist"],
+  "dependencies": {},
+  "peerDependencies": {
+    "express": ">=4"
   },
   "devDependencies": {
     "typescript": "^5",
-    "@types/express": "^5.0.6"
-
-  }
+    "@types/express": "^5.0.6",
+    "express": "^4.18.2"
+  },
+  "license": "MIT",
+  "keywords": ["express","rate-limiter","middleware","typescript","rate-limiting"]
 }
