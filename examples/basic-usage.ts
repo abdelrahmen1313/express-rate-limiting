@@ -16,7 +16,7 @@ app.use(rateLimiter)
 app.get("/", (req, res) => {
   res.json({
     message: "Hello!",
-    rateLimit: (req as any).rateLimit,
+    rateLimit: req.rateLimit,
   })
 })
 
