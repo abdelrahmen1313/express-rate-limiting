@@ -50,7 +50,6 @@ export function createRateLimiterMiddleware(config: MiddlewareOptions): RateLimi
     }
 
     const { status } = rateLimiter.checkRateLimit(clientIp)
-    const activeUsers = rateLimiter.getActiveClients();
     const ClientsCount = rateLimiter.getClientCount()
 
     // Set rate limit headers for client awareness
@@ -74,7 +73,6 @@ export function createRateLimiterMiddleware(config: MiddlewareOptions): RateLimi
       resetAt: status.resetAt,
     };
     req.rateLimitInfos = {
-     activeUsers : activeUsers,
      clientsCount : ClientsCount
     }
 

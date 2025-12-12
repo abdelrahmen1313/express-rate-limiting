@@ -61,7 +61,6 @@ declare global {
         resetAt: number;
       },
       rateLimitInfos?: {
-        activeUsers : ClientSnapshot[];
         clientsCount : number
       };
     }
