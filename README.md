@@ -15,13 +15,13 @@ A production-ready, type-safe rate limiter middleware for Express.js application
 
 ## Installation
 
-\`\`\`bash
+```bash
 npm install @edah/express-rate-limiting
-\`\`\`
+```
 
 ## Quick Start
 
-\`\`\`typescript
+```typescript
 import express from 'express';
 import { createRateLimiterMiddleware } from '@yourorg/express-rate-limiter';
 
@@ -39,24 +39,26 @@ app.use(rateLimiter);
 app.use('/api', rateLimiter);
 
 app.listen(3000);
-\`\`\`
+```
 
 ## Configuration
 
 ### Basic Options
 
-\`\`\`typescript
+```typescript
 interface RateLimiterConfig {
   maxRequests: number;           // Max requests per window (required)
   windowInMinutes?: number;      // Time window in minutes (default: 1)
   enableCleanup?: boolean;       // Enable automatic cleanup (default: true)
-  cleanupIntervalMinutes?: number; // Cleanup interval (default: 5)
+  cleanupIntervalMinutes?: number; // Cleanup interval (default: 90)
+    showInformativeHeaders?: boolean 
+
 }
-\`\`\`
+```
 
 ### Advanced Options
 
-\`\`\`typescript
+```typescript
 interface MiddlewareOptions extends RateLimiterConfig {
   // Custom function to extract client IP
   getClientIp?: (req: Request) => string;
@@ -67,26 +69,26 @@ interface MiddlewareOptions extends RateLimiterConfig {
   // Skip rate limiting for specific requests
   skip?: (req: Request) => boolean;
 }
-\`\`\`
+```
 
 ## Examples
 
 ### Basic Usage
 
-\`\`\`typescript
+```typescript
 const rateLimiter = createRateLimiterMiddleware({
   maxRequests: 100,
   windowInMinutes: 15,
 });
 
 app.use(rateLimiter);
-\`\`\`
+\```
 
 ### Custom IP Extraction
 
 For applications behind proxies (Cloudflare, AWS ALB, etc.):
 
-\`\`\`typescript
+```typescript
 const rateLimiter = createRateLimiterMiddleware({
   maxRequests: 100,
   windowInMinutes: 15,
@@ -99,11 +101,11 @@ const rateLimiter = createRateLimiterMiddleware({
     );
   },
 });
-\`\`\`
+```
 
 ### Skip Specific Paths
 
-\`\`\`typescript
+```typescript
 const rateLimiter = createRateLimiterMiddleware({
   maxRequests: 100,
   windowInMinutes: 15,
@@ -111,11 +113,11 @@ const rateLimiter = createRateLimiterMiddleware({
     return req.path === '/health' || req.path.startsWith('/admin');
   },
 });
-\`\`\`
+```
 
 ### Per-Route Rate Limits
 
-\`\`\`typescript
+```typescript
 const apiLimiter = createRateLimiterMiddleware({
   maxRequests: 50,
   windowInMinutes: 5,
@@ -130,7 +132,7 @@ app.use('/api', apiLimiter);
 app.post('/auth/login', authLimiter, (req, res) => {
   // Handle login
 });
-\`\`\`
+```
 
 ## Response Behavior
 
@@ -138,25 +140,25 @@ app.post('/auth/login', authLimiter, (req, res) => {
 
 Response includes rate limit headers:
 
-\`\`\`
+```yaml
 HTTP/1.1 200 OK
 X-RateLimit-Limit: 100
 X-RateLimit-Remaining: 99
 X-RateLimit-Reset: 1702123456
-\`\`\`
+```
 
 Request object includes rate limit info:
 
-\`\`\`typescript
+```typescript
 req.rateLimit = {
   remaining: 99,
   resetAt: 1702123456000,
 };
-\`\`\`
+```
 
 ### Rate Limited Request
 
-\`\`\`
+```yaml
 HTTP/1.1 429 Too Many Requests
 X-RateLimit-Limit: 100
 X-RateLimit-Remaining: 0
@@ -166,7 +168,7 @@ X-RateLimit-Reset: 1702123456
   "error": "Too many requests, please try again later",
   "retryAfter": 300
 }
-\`\`\`
+```
 
 ## How It Works
 
@@ -194,20 +196,24 @@ The middleware automatically cleans up expired entries:
 ## Monitoring
 
 Get active clients and statistics:
-npm install express-rate-limiting
-\`\`\`typescript
-import { RateLimiter } from '@yourorg/express-rate-limiter';
+
+```bash
+npm install @edah/express-rate-limiting
+```
+
+```typescript
+import { RateLimiter } from '@edah/express-rate-limiting';
 
 const limiter = new RateLimiter({
   maxRequests: 100,
   windowInMinutes: 15,
-import { createRateLimiterMiddleware } from 'express-rate-limiting';
+import { createRateLimiterMiddleware } from '@edah/express-rate-limiting';
 
 const activeClients = limiter.getActiveClients();
 const clientCount = limiter.getClientCount();
 
 console.log(`Active clients: ${clientCount}`);
-\`\`\`
+```
 
 ## Performance Considerations
 
