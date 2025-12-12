@@ -222,8 +222,6 @@ console.log(`Active clients: ${clientCount}`);
 - **Automatic cleanup** - Prevents unbounded memory growth
 - **No external dependencies** - Only requires Express
 
-import { RateLimiter } from 'express-rate-limiting';
-
 - [ ] Choose appropriate `maxRequests` and `windowInMinutes` for your API
 - [ ] Configure `getClientIp` for your infrastructure (cloud provider, proxy setup)
 - [ ] Set `skip` function for health checks and internal endpoints
