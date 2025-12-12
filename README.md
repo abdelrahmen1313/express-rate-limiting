@@ -51,7 +51,7 @@ interface RateLimiterConfig {
   windowInMinutes?: number;      // Time window in minutes (default: 1)
   enableCleanup?: boolean;       // Enable automatic cleanup (default: true)
   cleanupIntervalMinutes?: number; // Cleanup interval (default: 90)
-    showInformativeHeaders?: boolean 
+  showInformativeHeaders?: boolean  //  Control if the api should send X-RATE-LIMIT HEADERS (default : true) 
 
 }
 ```
@@ -96,8 +96,8 @@ const rateLimiter = createRateLimiterMiddleware({
     return (
       req.headers['cf-connecting-ip'] || // Cloudflare
       req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
-      req.socket?.remoteAddress ||
-      'unknown'
+      req.socket?.remoteAddress || req.ip
+      
     );
   },
 });
