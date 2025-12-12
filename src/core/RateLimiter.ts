@@ -8,12 +8,17 @@ export class RateLimiter {
   private clientSnapshots: Map<string, ClientSnapshot>
   private readonly maxRequests: number
   private readonly windowInMinutes: number
+  private cleanupInterval: NodeJS.Timeout | null = null
+
 
   constructor(config: RateLimiterConfig) {
     this.maxRequests = config.maxRequests
     this.windowInMinutes = config.windowInMinutes ?? 1
     this.clientSnapshots = new Map()
 
+    if (config.enableCleanup ?? true) {
+      this.startCleanup(config.cleanupIntervalMinutes ?? 5)
+    }
  
   }
 
@@ -95,6 +100,22 @@ export class RateLimiter {
     )
   }
 
+    /**
+   * Start periodic cleanup of expired entries
+   */
+  private startCleanup(intervalMinutes: number): void {
+    this.cleanupInterval = setInterval(
+      () => {
+        this.cleanup()
+      },
+      intervalMinutes * 60 * 1000,
+    )
+
+    // Prevent process from hanging if this is the only timer
+    if (this.cleanupInterval.unref) {
+      this.cleanupInterval.unref()
+    }
+  }
   
 
   /**
