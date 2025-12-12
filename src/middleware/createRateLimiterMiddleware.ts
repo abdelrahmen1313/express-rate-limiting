@@ -27,6 +27,9 @@ import type { MiddlewareOptions, RateLimitMiddleware } from "../types/index"
 export function createRateLimiterMiddleware(config: MiddlewareOptions): RateLimitMiddleware {
   const rateLimiter = new RateLimiter(config)
 
+
+  
+
   const defaultGetClientIp = (req: Request): string | undefined => {
     return (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || req.socket?.remoteAddress || req.ip
   }
@@ -41,6 +44,14 @@ export function createRateLimiterMiddleware(config: MiddlewareOptions): RateLimi
       return next()
     }
 
+    
+    if (rateLimiter.flagUserOverload()) {
+      console.warn(`[USER OVERLOAD FLAGGED] at ${req.url}`)
+      res.status(403).json({
+        message : "Route maximum users hitted"
+      })
+    }
+
     const clientIp = getClientIp(req)
 
     if (!clientIp) {
@@ -49,8 +60,9 @@ export function createRateLimiterMiddleware(config: MiddlewareOptions): RateLimi
       return;
     }
 
-    const { status } = rateLimiter.checkRateLimit(clientIp)
     const ClientsCount = rateLimiter.getClientCount()
+    const { status } = rateLimiter.checkRateLimit(clientIp)
+   
 
     // Set rate limit headers for client awareness
     if (showInformativeHeaders) {

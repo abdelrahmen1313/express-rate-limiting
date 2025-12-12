@@ -29,6 +29,8 @@ export interface RateLimiterConfig {
   cleanupIntervalMinutes?: number
   /** Control if the api should send X-RATE-LIMIT HEADERS (default : true) */
   showInformativeHeaders?: boolean
+  /** Maximum clients allowed per route  (default is 9999)*/
+  maxClients?: number
 }
 
 /**
@@ -50,7 +52,8 @@ export type RateLimitMiddleware = (req: Request, res: Response, next: NextFuncti
  */
 export interface MiddlewareOptions extends RateLimiterConfig {
   /** Function to determine if a request should skip rate limiting */
-  skip?: (req: Request) => boolean
+  skip?: (req: Request) => boolean,
+  
 }
 
 declare global {
