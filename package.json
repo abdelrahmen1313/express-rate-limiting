@@ -11,8 +11,7 @@
     "scripts": {
         "compile": "tsc -p tsconfig.build.json",
         "compile:watch": "tsc --watch -p tsconfig.build.json",
-        "prepare": "npm run compile",
-        "prepublishOnly": "npm run compile"
+        "prepare": "npm run compile"
     },
     "files": [
         "dist"
