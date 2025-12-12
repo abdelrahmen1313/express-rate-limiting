@@ -23,4 +23,3 @@ import type { MiddlewareOptions, RateLimitMiddleware } from "../types/index";
  */
 export declare function createRateLimiterMiddleware(config: MiddlewareOptions): RateLimitMiddleware;
 export default createRateLimiterMiddleware;
-//# sourceMappingURL=createRateLimiterMiddleware.d.ts.map

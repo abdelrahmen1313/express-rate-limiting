@@ -1,1 +1,0 @@
-{"version":3,"file":"createRateLimiterMiddleware.d.ts","sourceRoot":"","sources":["../../src/middleware/createRateLimiterMiddleware.ts"],"names":[],"mappings":"AAEA,OAAO,KAAK,EAAE,iBAAiB,EAAE,mBAAmB,EAAE,MAAM,gBAAgB,CAAA;AAE5E;;;;;;;;;;;;;;;;;;;;;GAqBG;AACH,wBAAgB,2BAA2B,CAAC,MAAM,EAAE,iBAAiB,GAAG,mBAAmB,CAkD1F;AAED,eAAe,2BAA2B,CAAA"}

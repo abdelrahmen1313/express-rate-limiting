@@ -9,4 +9,3 @@ Object.defineProperty(exports, "ClientSnapshot", { enumerable: true, get: functi
 // Middleware exports
 var createRateLimiterMiddleware_1 = require("./middleware/createRateLimiterMiddleware");
 Object.defineProperty(exports, "createRateLimiterMiddleware", { enumerable: true, get: function () { return createRateLimiterMiddleware_1.createRateLimiterMiddleware; } });
-//# sourceMappingURL=index.js.map

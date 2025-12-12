@@ -32,4 +32,3 @@ export declare class ClientSnapshot implements IClientSnapshot {
      */
     getWindowExpiryTime(windowInMinutes: number): number;
 }
-//# sourceMappingURL=ClientSnapshot.d.ts.map

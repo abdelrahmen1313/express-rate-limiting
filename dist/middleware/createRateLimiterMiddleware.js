@@ -69,4 +69,3 @@ function createRateLimiterMiddleware(config) {
     };
 }
 exports.default = createRateLimiterMiddleware;
-//# sourceMappingURL=createRateLimiterMiddleware.js.map

@@ -46,4 +46,3 @@ export declare class RateLimiter {
      */
     getClientCount(): number;
 }
-//# sourceMappingURL=RateLimiter.d.ts.map
