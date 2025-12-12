@@ -21,7 +21,10 @@
     "peerDependencies": {
         "express": ">=4"
     },
-    "repository": "https://github.com/abdelrahmen1313/express-rate-limiting",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/abdelrahmen1313/express-rate-limiting.git"
+    },
     "devDependencies": {
         "typescript": "^5",
         "@types/express": "^5.0.6",
