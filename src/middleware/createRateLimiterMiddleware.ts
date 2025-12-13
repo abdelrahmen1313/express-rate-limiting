@@ -44,13 +44,14 @@ export function createRateLimiterMiddleware(config: MiddlewareOptions): RateLimi
       return next()
     }
 
-    
+
     if (rateLimiter.flagUserOverload()) {
-      console.warn(`[USER OVERLOAD FLAGGED] at ${req.url}`)
-      res.status(403).json({
-        message : "Route maximum users hitted"
-      })
+      console.warn(`[ROUTE OVERLOAD FLAGGED] at ${req.url}`);
+      res.status(403).end();
+      return;
     }
+    
+
 
     const clientIp = getClientIp(req)
 
@@ -60,9 +61,9 @@ export function createRateLimiterMiddleware(config: MiddlewareOptions): RateLimi
       return;
     }
 
-    const ClientsCount = rateLimiter.getClientCount()
+
     const { status } = rateLimiter.checkRateLimit(clientIp)
-   
+    const ClientsCount = rateLimiter.getClientCount()
 
     // Set rate limit headers for client awareness
     if (showInformativeHeaders) {

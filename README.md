@@ -73,7 +73,7 @@ app.listen(3000);
   maxRequests: number;             # Max requests per window (required)
   windowInMinutes?: number;        # Time window in minutes (default: 1)
   enableCleanup?: boolean;         # Enable automatic cleanup (default: true)
-  cleanupIntervalMinutes?: number  # Cleanup interval in minutes (default: 90)
+  cleanupIntervalMinutes?: number  # Cleanup interval in minutes (default: 5)
   showInformativeHeaders?: boolean #  Control if the api should send X-RATE-LIMIT HEADERS (default : true)
   maxClients?: number              # Maximum clients allowed per route  (default : 9999) 
 
@@ -187,7 +187,7 @@ X - RateLimit - Reset : 1702123456
 
 The middleware automatically cleans up expired entries:
 
-- Cleanup runs every 90 minutes by default (configurable)
+- Cleanup runs every 5 minutes by default (configurable)
 - Only expired snapshots are removed
 - Can be disabled with ` enableCleanup : false ` if managing memory differently
 

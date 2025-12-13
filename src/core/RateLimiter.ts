@@ -18,7 +18,7 @@ export class RateLimiter {
     this.clientSnapshots = new Map()
     this.maxClients = config.maxClients ?? 9999
     if (config.enableCleanup ?? true) {
-      this.startCleanup(config.cleanupIntervalMinutes ?? 90)
+      this.startCleanup(config.cleanupIntervalMinutes ?? 5)
     }
  
   }
@@ -27,7 +27,7 @@ export class RateLimiter {
    * check if number of active users is above maxClients
    */
   flagUserOverload() {
-    return this.getClientCount() > 9999
+    return this.getClientCount() > this.maxClients
   }
 
   /**
