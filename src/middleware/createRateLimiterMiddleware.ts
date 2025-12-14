@@ -46,7 +46,7 @@ export function createRateLimiterMiddleware(config: MiddlewareOptions): RateLimi
 
 
     if (rateLimiter.flagUserOverload()) {
-      console.warn(`[ROUTE OVERLOAD FLAGGED] at ${req.url}`);
+      console.warn(`[RATE LIMITER - ROUTE OVERLOAD FLAGGED] at ${req.url}`);
       res.status(403).end();
       return;
     }

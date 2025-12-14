@@ -1,12 +1,12 @@
 # Express Rate Limiter
 
-A production - ready, type - safe rate limiter middleware for Express.js applications built with TypeScript.
+A production-ready, type-safe rate limiter middleware for Express.js applications built with TypeScript.
 
 ## Features
 
 - ✅ **Type - Safe**
 
-  -Full TypeScript support with comprehensive types
+ -Full TypeScript support with comprehensive types
 
 - ✅ **Lightweight**
 
@@ -38,15 +38,15 @@ A production - ready, type - safe rate limiter middleware for Express.js applica
 
 ## Installation
 
-`` `bash
+```bash
 npm install @edah/express-rate-limiting
-` ``
+```
 
 ## Quick Start
 
 ```typescript
 import express from 'express';
-import { createRateLimiterMiddleware } from '@yourorg/express-rate-limiter';
+import { createRateLimiterMiddleware } from '@edah/express-rate-limiting';
 
 const app = express();
 
@@ -112,7 +112,7 @@ const rateLimiter = createRateLimiterMiddleware({
         return req.path === "/health" || req.path === "/metrics"
     },
 
-    // Cleanup expired records every 10 minutes -- default is 90
+    // Cleanup expired records every 10 minutes -- default is 5
     cleanupIntervalMinutes: 10
 })
 ```
@@ -193,7 +193,7 @@ The middleware automatically cleans up expired entries:
 
 ## Monitoring
 
-Get active clients and statistics:
+Get active clients number :
 
 ``` typescript
 app
@@ -209,10 +209,10 @@ res.json({message: "Hello!", rateLimit: req.rateLimit, infos: req.rateLimitInfos
 - **Minimal overhead** - Lightweight class instances, no external I/O
 - **Automatic cleanup** - Prevents unbounded memory growth
 - **No external dependencies** - Only requires Express
+- **Overrideable Methods** - You can use the skip() decorator to skip rate limiting internal routes
 
 - [ ] Choose appropriate ` maxRequests ` and ` windowInMinutes ` for your API
 - [ ] Configure ` getClientIp ` for your infrastructure (cloud provider, proxy setup)
-- [ ] Set ` skip ` function for health checks and internal endpoints
 - [ ] Monitor active clients for spikes or anomalies
 - [ ] Set up logging/monitoring for 429 responses
 - [ ] Consider different limits for different endpoints
