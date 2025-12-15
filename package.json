@@ -1,6 +1,6 @@
 {
     "name": "@edah/express-rate-limiting",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "description": "Production-ready rate limiter middleware for Express.js",
     "private": false,
     "main": "dist/index.js",
