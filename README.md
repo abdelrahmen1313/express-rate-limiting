@@ -210,12 +210,22 @@ res.json({message: "Hello!", rateLimit: req.rateLimit, infos: req.rateLimitInfos
 - **Automatic cleanup** - Prevents unbounded memory growth
 - **No external dependencies** - Only requires Express
 - **Overrideable Methods** - You can use the skip() decorator to skip rate limiting internal routes
+- **Monitor** active clients for spikes or anomalies
 
-- [ ] Choose appropriate ` maxRequests ` and ` windowInMinutes ` for your API
-- [ ] Configure ` getClientIp ` for your infrastructure (cloud provider, proxy setup)
-- [ ] Monitor active clients for spikes or anomalies
-- [ ] Set up logging/monitoring for 429 responses
-- [ ] Consider different limits for different endpoints
+## Contributing
+
+Contributions are welcome!
+If you'd like to improve this utility, fix bugs (if found), or suggest a new feature :
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/my-feature-name`)
+3. Commit your changes (`git commit -m "feat: add my feature"`)
+4. Push to your branch (`git push origin feature/my-feature-name`)
+5. Open a pull request
+
+Please follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
+
+Feedback and suggestions help shape the roadmap.
 
 ## License
 
