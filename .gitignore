@@ -3,3 +3,4 @@ node_modules/
 dist/
 .npmrc
 .npmignore
+tsconfig.build.tsbuildinfo
