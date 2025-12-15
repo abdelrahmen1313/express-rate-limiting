@@ -42,7 +42,18 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+          npm config set registry https://registry.npmjs.org/
+          npm config set //registry.npmjs.org/:_authToken "${NPM_TOKEN}"
+
+      - name: Verify npm auth
+        run: |
+          echo "npm registry: $(npm config get registry)"
+          if ! npm whoami >/dev/null 2>&1; then
+            echo "ERROR: NPM auth failed. Ensure repository secret 'NPM_TOKEN' is set to a valid npm automation token with publish permissions for the package scope."
+            npm whoami || true
+            exit 1
+          fi
+          echo "NPM auth OK: $(npm whoami)"
 
       - name: Bump version
         id: bump
