@@ -1,113 +1,38 @@
-name: Publish & Release
-
+name: publish
 on:
-  push:
-    branches:
-      - main
-    tags:
-      - 'v*'
-  workflow_dispatch:
-    inputs:
-      bump:
-        description: 'Version bump (major, minor, patch)'
-        required: false
-        default: 'patch'
-
+ push:
+   branches:
+     - main # Trigger on pushes to the main branch
 jobs:
-  release:
-    if: ${{ !contains(github.actor, '[bot]') }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      actions: write
-    steps:
-      - name: checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+ publish:
+   runs-on: ubuntu-latest
+   steps:
+     - name: Checkout repository
+       uses: actions/checkout@v3
+       with:
+         fetch-depth: 0
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 'lts/*'
-          registry-url: 'https://registry.npmjs.org'
+     - name: Setup Node.js
+       uses: actions/setup-node@v4
+       with:
+         node-version: 'lts/*'
+         registry-url: 'https://registry.npmjs.org/'
 
-      - name: Install dependencies
-        run: npm ci
+     - name: Install dependencies
+       run: npm ci
 
-      - name: Build
-        run: npm run compile
+     - name: Configure Git
+       run: |
+         git config --global user.name 'abdelrahmen1313'
+         git config --global user.email ${{ secrets.EMAIL }}
 
-      - name: Set up npm auth
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          npm config set registry https://registry.npmjs.org/
-          npm config set //registry.npmjs.org/:_authToken "${NPM_TOKEN}"
+     - name: Patch Version
+       run : npm version patch
 
-      - name: Verify npm auth
-        run: |
-          echo "npm registry: $(npm config get registry)"
-          if ! npm whoami >/dev/null 2>&1; then
-            echo "ERROR: NPM auth failed. Ensure repository secret 'NPM_TOKEN' is set to a valid npm automation token with publish permissions for the package scope."
-            npm whoami || true
-            exit 1
-          fi
-          echo "NPM auth OK: $(npm whoami)"
-
-      - name: Bump version
-        id: bump
-        if: "!startsWith(github.ref, 'refs/tags/')"
-        env:
-          BUMP: ${{ github.event.inputs.bump || 'patch' }}
-        run: |
-          echo "Bumping version: $BUMP"
-          npm version $BUMP --no-git-tag-version
-          VERSION=$(node -p "require('./package.json').version")
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Commit and push version & tag
-        id: commit
-        if: "!startsWith(github.ref, 'refs/tags/')"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          VERSION=${{ steps.bump.outputs.version }}
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package.json package-lock.json || true
-          git commit -m "chore(release): v$VERSION [skip ci]" || echo "No changes to commit"
-          git tag "v$VERSION"
-          git push --follow-tags origin HEAD
-          echo "created_tag=true" >> $GITHUB_OUTPUT
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Determine tag name
-        id: tag
-        if: ${{ startsWith(github.ref, 'refs/tags/') || steps.commit.outputs.created_tag == 'true' }}
-        run: |
-          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            TAG=${GITHUB_REF#refs/tags/}
-          else
-            TAG=v${{ steps.bump.outputs.version }}
-          fi
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
-
-      - name: Publish to npm
-        if: ${{ startsWith(github.ref, 'refs/tags/') || steps.commit.outputs.created_tag == 'true' }}
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish --access public
-
-      - name: Create GitHub Release
-        if: ${{ startsWith(github.ref, 'refs/tags/') || steps.commit.outputs.created_tag == 'true' }}
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ steps.tag.outputs.tag }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            
-
+     - name: Publish to npm
+       run: npm publish
+       env:
+         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
          
 
 
