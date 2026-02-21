@@ -1,39 +1,41 @@
 name: publish
 on:
- push:
-   branches:
-     - main # Trigger on pushes to the main branch
+  push:
+    branches:
+      - main # Trigger on pushes to the main branch
+
+# Needed for `npm version patch` (creates a commit + tag)
+permissions:
+  contents: write
+
 jobs:
- publish:
-   runs-on: ubuntu-latest
-   steps:
-     - name: Checkout repository
-       uses: actions/checkout@v3
-       with:
-         fetch-depth: 0
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-     - name: Setup Node.js
-       uses: actions/setup-node@v4
-       with:
-         node-version: 'lts/*'
-         registry-url: 'https://registry.npmjs.org/'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          registry-url: 'https://registry.npmjs.org/'
 
-     - name: Install dependencies
-       run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-     - name: Configure Git
-       run: |
-         git config --global user.name 'abdelrahmen1313'
-         git config --global user.email ${{ secrets.EMAIL }}
+      - name: Configure Git
+        run: |
+          git config --global user.name 'abdelrahmen1313'
+          git config --global user.email ${{ secrets.EMAIL }}
 
-     - name: Patch Version
-       run : npm version patch
+      - name: Patch Version
+        run: npm version patch
 
-     - name: Publish to npm
-       run: npm publish
-       env:
-         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-         
-
-
+      - name: Publish to npm
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
             
