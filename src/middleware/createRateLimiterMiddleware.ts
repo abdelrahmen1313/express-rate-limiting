@@ -28,13 +28,13 @@ export function createRateLimiterMiddleware(config: MiddlewareOptions): RateLimi
   const rateLimiter = new RateLimiter(config)
 
 
-  
 
-  const defaultGetClientIp = (req: Request): string | undefined => {
+  // using ip address as default client id (if no config.getClientId() is provided)
+  const _getClientId = (req: Request): string | undefined => {
     return (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || req.socket?.remoteAddress || req.ip
   }
 
-  const getClientIp = config.getClientIp || defaultGetClientIp
+  const getClientId = config.getClientId || _getClientId
   const errorMessage = config.errorMessage || "Too many requests, please try again later"
   const showInformativeHeaders = config.showInformativeHeaders ?? true
 
@@ -50,19 +50,19 @@ export function createRateLimiterMiddleware(config: MiddlewareOptions): RateLimi
       res.status(403).end();
       return;
     }
-    
 
 
-    const clientIp = getClientIp(req)
 
-    if (!clientIp) {
+    const clientId = getClientId(req)
+
+    if (!clientId) {
       console.warn("[RateLimiter] Could not determine client IP")
       res.status(500).end();
       return;
     }
 
 
-    const { status } = rateLimiter.checkRateLimit(clientIp)
+    const { status } = rateLimiter.checkRateLimit(clientId)
     const ClientsCount = rateLimiter.getClientCount()
 
     // Set rate limit headers for client awareness
@@ -70,11 +70,11 @@ export function createRateLimiterMiddleware(config: MiddlewareOptions): RateLimi
       res.setHeader("X-RateLimit-Limit", config.maxRequests)
       res.setHeader("X-RateLimit-Remaining", status.remaining)
       res.setHeader("X-RateLimit-Reset", Math.ceil(status.resetAt / 1000))
-    } 
+    }
 
 
     if (!status.allowed) {
-       res.status(429).json({
+      res.status(429).json({
         error: errorMessage,
         retryAfter: Math.ceil((status.resetAt - Date.now()) / 1000),
       })
@@ -86,7 +86,7 @@ export function createRateLimiterMiddleware(config: MiddlewareOptions): RateLimi
       resetAt: status.resetAt,
     };
     req.rateLimitInfos = {
-     clientsCount : ClientsCount
+      clientsCount: ClientsCount
     }
 
     next()

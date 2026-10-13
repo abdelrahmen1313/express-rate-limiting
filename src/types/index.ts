@@ -5,7 +5,7 @@ import { ClientSnapshot } from "../core/ClientSnapshot"
  * Represents a snapshot of a client's rate limiting state
  */
 export interface IClientSnapshot {
-  clientIpAddress: string
+  clientId: string
   timestamp: number
   hits: number
   maxHits: number
@@ -53,7 +53,8 @@ export type RateLimitMiddleware = (req: Request, res: Response, next: NextFuncti
 export interface MiddlewareOptions extends RateLimiterConfig {
   /** Function to determine if a request should skip rate limiting */
   skip?: (req: Request) => boolean,
-  
+  getClientId?: (req: Request) => string
+
 }
 
 declare global {
@@ -64,8 +65,7 @@ declare global {
         resetAt: number;
       },
       rateLimitInfos?: {
-     
-        clientsCount : number
+        clientsCount: number
       };
     }
   }

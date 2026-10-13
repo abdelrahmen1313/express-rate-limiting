@@ -8,9 +8,9 @@ export class RateLimiter {
   private clientSnapshots: Map<string, ClientSnapshot>
   private readonly maxRequests: number
   private readonly windowInMinutes: number
-  private cleanupInterval: ReturnType <typeof setInterval> | null = null
+  private cleanupInterval: ReturnType<typeof setInterval> | null = null
 
-  private maxClients : number
+  private maxClients: number
 
   constructor(config: RateLimiterConfig) {
     this.maxRequests = config.maxRequests
@@ -20,7 +20,7 @@ export class RateLimiter {
     if (config.enableCleanup ?? true) {
       this.startCleanup(config.cleanupIntervalMinutes ?? 5)
     }
- 
+
   }
 
   /**
@@ -34,27 +34,27 @@ export class RateLimiter {
    * Check rate limit status for a client IP
    * Returns the updated snapshot and status
    */
-  checkRateLimit(clientIp: string): {
+  checkRateLimit(clientId: string): {
     snapshot: ClientSnapshot
     status: RateLimitStatus
   } {
-    const existingSnapshot = this.clientSnapshots.get(clientIp)
+    const existingSnapshot = this.clientSnapshots.get(clientId)
 
     let snapshot: ClientSnapshot
 
     if (!existingSnapshot) {
       // New client
-      snapshot = new ClientSnapshot(clientIp, this.maxRequests)
+      snapshot = new ClientSnapshot(clientId, this.maxRequests)
     } else if (existingSnapshot.isWindowExpired(this.windowInMinutes)) {
       // Window expired, reset
-      this.resetClient(clientIp)
-      snapshot = new ClientSnapshot(clientIp, this.maxRequests)
+      this.resetClient(clientId)
+      snapshot = new ClientSnapshot(clientId, this.maxRequests)
     } else {
       // Window active, increment hits
       snapshot = existingSnapshot.incrementHits()
     }
 
-    this.clientSnapshots.set(clientIp, snapshot)
+    this.clientSnapshots.set(clientId, snapshot)
 
     const status: RateLimitStatus = {
       allowed: !snapshot.isRateLimited(),
@@ -109,9 +109,9 @@ export class RateLimiter {
     )
   }
 
-    /**
-   * Start periodic cleanup of expired entries
-   */
+  /**
+ * Start periodic cleanup of expired entries
+ */
   private startCleanup(intervalMinutes: number): void {
     this.cleanupInterval = setInterval(
       () => {
@@ -125,7 +125,7 @@ export class RateLimiter {
       this.cleanupInterval.unref()
     }
   }
-  
+
 
   /**
    * Remove expired entries from the map

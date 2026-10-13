@@ -5,13 +5,13 @@ import type { IClientSnapshot } from "../types/index"
  * Immutable by design - create new instances for updates
  */
 export class ClientSnapshot implements IClientSnapshot {
-  readonly clientIpAddress: string
+  readonly clientId: string
   readonly timestamp: number
   readonly hits: number
   readonly maxHits: number
 
-  constructor(clientIpAddress: string, maxHits: number, timestamp: number = Date.now(), hits = 1) {
-    this.clientIpAddress = clientIpAddress
+  constructor(clientId: string, maxHits: number, timestamp: number = Date.now(), hits = 1) {
+    this.clientId = clientId
     this.timestamp = timestamp
     this.hits = hits
     this.maxHits = maxHits
@@ -21,7 +21,7 @@ export class ClientSnapshot implements IClientSnapshot {
    * Create a new snapshot with incremented hits
    */
   incrementHits(): ClientSnapshot {
-    return new ClientSnapshot(this.clientIpAddress, this.maxHits, this.timestamp, this.hits + 1)
+    return new ClientSnapshot(this.clientId, this.maxHits, this.timestamp, this.hits + 1)
   }
 
   /**

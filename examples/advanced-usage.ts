@@ -14,10 +14,10 @@ const rateLimiter = createRateLimiterMiddleware({
   windowInMinutes: 5,
   errorMessage: "API rate limit exceeded. Please wait before making more requests.",
 
-  // Custom IP extractor for cloud environments
-  getClientIp: (req: Request) => {
+  // Custom key extractor
+  getClientId: (req: Request) => {
     return (
-      (req.headers["cf-connecting-ip"] as string) || // Cloudflare
+      (req.headers["cf-connecting-ip"] as string) ||
       (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
       req.socket?.remoteAddress || req.ip
     )
