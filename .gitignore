@@ -4,3 +4,4 @@ dist/
 .npmrc
 .npmignore
 tsconfig.build.tsbuildinfo
+*buff/

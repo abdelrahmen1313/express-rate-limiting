@@ -1,9 +1,9 @@
 // Core exports
-export { RateLimiter } from "./core/RateLimiter"
-export { ClientSnapshot } from "./core/ClientSnapshot"
+export { RateLimiter } from "./core/RateLimiter.js"
+export { ClientSnapshot } from "./core/ClientSnapshot.js"
 
 // Middleware exports
-export { createRateLimiterMiddleware } from "./middleware/createRateLimiterMiddleware"
+export { createRateLimiterMiddleware } from "./middleware/createRateLimiterMiddleware.js"
 
 // Type exports
 export type {
@@ -12,4 +12,4 @@ export type {
   RateLimitStatus,
   RateLimitMiddleware,
   MiddlewareOptions,
-} from "./types/index"
+} from "./types/index.js"
