@@ -1,12 +1,17 @@
-const test = require("node:test")
-const assert = require("node:assert/strict")
-const { createRateLimiterMiddleware } = require("../dist/index.js")
+import test from "node:test"
+import assert from "node:assert/strict"
+import { createRateLimiterMiddleware } from "../dist/index.js"
 
-function makeReq({ headers = {}, ip, remoteAddress = "1.2.3.4", url = "/api", path = "/logic" } = {}) {
+const defaultConfig = {
+  maxRequests: 3,
+  windowInMinutes: 1,
+  getSnapshotId: (req) => req.socket.remoteAddress,
+}
+
+function makeReq({ headers = {}, remoteAddress = "1.2.3.4", url = "/api", path = "/api" } = {}) {
   return {
     headers,
     socket: remoteAddress ? { remoteAddress } : {},
-    ip,
     url,
     path,
   }
@@ -53,20 +58,8 @@ function run(mw, req) {
   return { req, res, nextCalls }
 }
 
-/** console.warn is used by the middleware for missing IPs / overload - keep test output clean */
-function quietWarnings(fn) {
-  const original = console.warn
-  const warnings = []
-  console.warn = (...args) => warnings.push(args.join(" "))
-  try {
-    return fn(warnings)
-  } finally {
-    console.warn = original
-  }
-}
-
 test("allows a request under the limit and attaches rate limit info", () => {
-  const mw = createRateLimiterMiddleware({ maxRequests: 3, enableCleanup: false })
+  const mw = createRateLimiterMiddleware(defaultConfig)
   const { req, res, nextCalls } = run(mw, makeReq())
 
   assert.equal(nextCalls, 1)
@@ -79,36 +72,55 @@ test("allows a request under the limit and attaches rate limit info", () => {
   assert.deepEqual(req.rateLimitInfos, { clientsCount: 1 })
 })
 
-test("answers 429 with the error message once the window quota is used up", () => {
+test("allows exactly maxRequests requests, then answers 429 (off-by-one regression guard)", () => {
   const mw = createRateLimiterMiddleware({
     maxRequests: 3,
+    windowInMinutes: 1,
     errorMessage: "slow down",
-    enableCleanup: false,
+    getSnapshotId: (req) => req.socket.remoteAddress,
   })
 
   const first = run(mw, makeReq())
   const second = run(mw, makeReq())
   const third = run(mw, makeReq())
+  const fourth = run(mw, makeReq())
 
   assert.equal(first.nextCalls, 1)
   assert.equal(second.nextCalls, 1)
+  assert.equal(third.nextCalls, 1)
+  assert.equal(third.req.rateLimit.remaining, 0)
 
-  assert.equal(third.nextCalls, 0)
-  assert.equal(third.res.statusCode, 429)
-  assert.equal(third.res.jsonCalls, 1)
-  assert.equal(third.res.body.error, "slow down")
-  assert.ok(third.res.body.retryAfter >= 1)
-  assert.ok(third.res.body.retryAfter <= 60)
-  assert.equal(third.res.getHeader("X-RateLimit-Remaining"), 0)
-  assert.equal(third.req.rateLimit, undefined) // rejected requests get no req.rateLimit
+  assert.equal(fourth.nextCalls, 0)
+  assert.equal(fourth.res.statusCode, 429)
+  assert.equal(fourth.res.jsonCalls, 1)
+  assert.equal(fourth.res.body.error, "slow down")
+  assert.ok(fourth.res.body.retryAfter >= 1)
+  assert.ok(fourth.res.body.retryAfter <= 60)
+  assert.equal(fourth.res.getHeader("X-RateLimit-Remaining"), 0)
+  assert.equal(fourth.req.rateLimit, undefined) // rejected requests get no req.rateLimit
 })
 
-/*
+test("answers 429 with the default message when none is configured", () => {
+  const mw = createRateLimiterMiddleware({
+    maxRequests: 1,
+    windowInMinutes: 1,
+    getSnapshotId: (req) => req.socket.remoteAddress,
+  })
+
+  assert.equal(run(mw, makeReq()).nextCalls, 1) // the single allowed slot
+
+  const second = run(mw, makeReq())
+  assert.equal(second.res.statusCode, 429)
+  assert.equal(second.res.body.error, "Too many requests, please try again later")
+  assert.ok(second.res.body.retryAfter >= 1)
+})
+
 test("skip() routes are never rate limited", () => {
   const mw = createRateLimiterMiddleware({
     maxRequests: 3,
-    enableCleanup: false,
+    windowInMinutes: 1,
     skip: (req) => req.path === "/health",
+    getSnapshotId: (req) => req.socket.remoteAddress,
   })
 
   for (let i = 0; i < 5; i++) {
@@ -122,40 +134,30 @@ test("skip() routes are never rate limited", () => {
   assert.deepEqual(real.req.rateLimitInfos, { clientsCount: 1 }) // skipped calls never created a client
 })
 
-test("custom getClientId keys clients independently of the socket address", () => {
+test("getSnapshotId keys clients independently", () => {
   const mw = createRateLimiterMiddleware({
     maxRequests: 3,
-    enableCleanup: false,
-    getClientId: (req) => req.headers["x-tenant"],
+    windowInMinutes: 1,
+    getSnapshotId: (req) => req.headers["x-tenant"],
   })
 
   const asTenant = () => run(mw, makeReq({ headers: { "x-tenant": "a" } }))
   assert.equal(asTenant().nextCalls, 1)
   assert.equal(asTenant().nextCalls, 1)
-  assert.equal(asTenant().nextCalls, 0) // quota used up (off-by-one: maxRequests 3 -> 2 allowed)
+  assert.equal(asTenant().nextCalls, 1)
+  assert.equal(asTenant().nextCalls, 0) // quota used up on the 4th request
 
   const otherTenant = run(mw, makeReq({ headers: { "x-tenant": "b" } }))
   assert.equal(otherTenant.nextCalls, 1)
   assert.deepEqual(otherTenant.req.rateLimitInfos, { clientsCount: 2 })
 })
 
-test("default client id prefers the first X-Forwarded-For hop", () => {
-  const mw = createRateLimiterMiddleware({ maxRequests: 3, enableCleanup: false })
-
-  run(mw, makeReq({ headers: { "x-forwarded-for": "10.0.0.1, 10.0.0.2" } }))
-  const sameClient = run(mw, makeReq({ headers: { "x-forwarded-for": "10.0.0.1, 10.0.0.9" } }))
-  assert.equal(sameClient.nextCalls, 1)
-  assert.equal(sameClient.req.rateLimit.remaining, 1)
-
-  const otherClient = run(mw, makeReq({ headers: { "x-forwarded-for": "10.0.0.5" } }))
-  assert.equal(otherClient.req.rateLimit.remaining, 2)
-})
-
 test("showInformativeHeaders:false omits the X-RateLimit headers but still limits", () => {
   const mw = createRateLimiterMiddleware({
-    maxRequests: 2,
+    maxRequests: 1,
+    windowInMinutes: 1,
     showInformativeHeaders: false,
-    enableCleanup: false,
+    getSnapshotId: (req) => req.socket.remoteAddress,
   })
 
   const first = run(mw, makeReq())
@@ -167,13 +169,3 @@ test("showInformativeHeaders:false omits the X-RateLimit headers but still limit
   const second = run(mw, makeReq())
   assert.equal(second.res.statusCode, 429)
 })
-
-
-test("log a warning once maxClients is exceeded", () => {
-  quietWarnings((warnings) => {
-    const mw = createRateLimiterMiddleware({ maxRequests: 10, maxClients: 1, enableCleanup: false })
-    run(mw, makeReq({ url: '/api/v1' }));
-    assert.ok(warnings.some((w) => w.includes(`[RATE LIMITER - ROUTE OVERLOAD FLAGGED] at ${req.url}`)))
-  })
-})
-*/

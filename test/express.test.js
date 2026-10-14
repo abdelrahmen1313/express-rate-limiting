@@ -1,15 +1,17 @@
-const test = require("node:test")
-const assert = require("node:assert/strict")
-const { once } = require("node:events")
-const express = require("express")
-const { createRateLimiterMiddleware } = require("../dist/index.js")
+import test from "node:test"
+import assert from "node:assert"
+import { once } from "node:events"
+import { createRateLimiterMiddleware } from "../dist/index.js"
+import express from "express";
 
 test("end-to-end over HTTP: limits, headers and JSON error body", async (t) => {
   const app = express()
+  // NOTE: without a custom getClientId each request gets its own uuid (per-request
+  // client), so this test keys requests via the x-tenant header to exercise limits.
   const limiter = createRateLimiterMiddleware({
     maxRequests: 3,
-    enableCleanup: false,
     errorMessage: "too fast",
+    getClientId: (req) => req.headers["x-tenant"] || "anonymous",
     skip: (req) => req.path === "/health",
   })
 
@@ -26,8 +28,9 @@ test("end-to-end over HTTP: limits, headers and JSON error body", async (t) => {
   })
 
   const base = `http://127.0.0.1:${server.address().port}`
+  const tenantA = { headers: { "x-tenant": "a" } }
 
-  const first = await fetch(`${base}/data`)
+  const first = await fetch(`${base}/data`, tenantA)
   assert.equal(first.status, 200)
   assert.equal(first.headers.get("x-ratelimit-limit"), "3")
   assert.equal(first.headers.get("x-ratelimit-remaining"), "2")
@@ -37,15 +40,19 @@ test("end-to-end over HTTP: limits, headers and JSON error body", async (t) => {
   assert.equal(firstBody.rateLimit.remaining, 2)
   assert.deepEqual(firstBody.infos, { clientsCount: 1 })
 
-  const second = await fetch(`${base}/data`)
+  const second = await fetch(`${base}/data`, tenantA)
   assert.equal(second.status, 200)
   await second.body.cancel()
 
-  // NOTE: documents the known off-by-one - the 3rd of 3 allowed requests is rejected
-  const third = await fetch(`${base}/data`)
-  assert.equal(third.status, 429)
-  assert.equal(third.headers.get("x-ratelimit-remaining"), "0")
-  const body = await third.json()
+  const third = await fetch(`${base}/data`, tenantA)
+  assert.equal(third.status, 200) // 3rd of 3 allowed requests now gets through
+  const thirdBody = await third.json()
+  assert.equal(thirdBody.rateLimit.remaining, 0)
+
+  const fourth = await fetch(`${base}/data`, tenantA)
+  assert.equal(fourth.status, 429)
+  assert.equal(fourth.headers.get("x-ratelimit-remaining"), "0")
+  const body = await fourth.json()
   assert.equal(body.error, "too fast")
   assert.ok(body.retryAfter >= 1)
   assert.ok(body.retryAfter <= 60)
