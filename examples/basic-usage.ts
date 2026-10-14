@@ -7,8 +7,13 @@ const app = express()
  * Basic setup: 100 requests per 15 minutes
  */
 const rateLimiter = createRateLimiterMiddleware({
+
   maxRequests: 3,
   windowInMinutes: 2,
+
+  getSnapshotId(req) {
+    return req.id || req.uid || req.userId
+  },
 })
 
 app.use(rateLimiter)
@@ -18,7 +23,7 @@ app.get("/", (req, res) => {
   res.json({
     message: "Hello!",
     rateLimit: req.rateLimit,
-    infos : req.rateLimitInfos
+    infos: req.rateLimitInfos
   })
 })
 

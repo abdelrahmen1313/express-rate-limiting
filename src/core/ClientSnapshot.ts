@@ -1,4 +1,4 @@
-import type { IClientSnapshot } from "../types/index"
+import type { IClientSnapshot } from "../types/index.js"
 
 /**
  * Represents a client's current rate limiting state
@@ -6,22 +6,22 @@ import type { IClientSnapshot } from "../types/index"
  */
 export class ClientSnapshot implements IClientSnapshot {
   readonly clientId: string
-  readonly timestamp: number
-  readonly hits: number
+  readonly timestamp: number = 0;
+  hits: number
   readonly maxHits: number
 
-  constructor(clientId: string, maxHits: number, timestamp: number = Date.now(), hits = 1) {
+  constructor(clientId: string, maxHits: number, hits: number = 1) {
+    this.timestamp = Date.now()
     this.clientId = clientId
-    this.timestamp = timestamp
     this.hits = hits
     this.maxHits = maxHits
   }
 
   /**
-   * Create a new snapshot with incremented hits
+   * just increment the hits on the existing snapshot
    */
-  incrementHits(): ClientSnapshot {
-    return new ClientSnapshot(this.clientId, this.maxHits, this.timestamp, this.hits + 1)
+  incrementHits(): void {
+    this.hits += 1
   }
 
   /**

@@ -8,11 +8,13 @@
     "publishConfig": {
         "access": "public"
     },
+    "type": "module",
     "scripts": {
         "compile": "tsc -p tsconfig.build.json",
         "compile:watch": "tsc --watch -p tsconfig.build.json",
         "test": "tsc -p tsconfig.build.json && node --test \"test/*.test.js\"",
-        "prepare": "npm run compile"
+        "prepare": "npm run compile",
+        "lint": "eslint"
     },
     "files": [
         "dist"
@@ -25,9 +27,13 @@
         "url": "git+https://github.com/abdelrahmen1313/express-rate-limiting.git"
     },
     "devDependencies": {
+        "@eslint/js": "^10.0.1",
         "@types/express": "^5.0.6",
+        "eslint": "^10.12.0",
         "express": "^4.22.3",
-        "typescript": "^5.9.3"
+        "globals": "^17.13.0",
+        "typescript": "^5.9.3",
+        "typescript-eslint": "^8.71.2"
     },
     "license": "MIT",
     "keywords": [

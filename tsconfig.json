@@ -6,10 +6,10 @@
       "esnext"
     ],
     "allowJs": true,
-    "target": "ES6",
+    "target": "esnext",
     "skipLibCheck": true,
     "strict": true,
-    "noEmit": true,
+    "noEmit": false,
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
@@ -27,6 +27,7 @@
         "./*"
       ]
     },
+    "rootDir": "./src",
     "outDir": "./dist",
     "declaration": true,
     "declarationMap": false,
