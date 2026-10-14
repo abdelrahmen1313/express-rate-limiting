@@ -68,8 +68,8 @@ export class RateLimiter {
   /**
    * Get the current status without modifying the snapshot
    */
-  getStatus(clientIp: string): RateLimitStatus | null {
-    const snapshot = this.clientSnapshots.get(clientIp)
+  getStatus(clientId: string): RateLimitStatus | null {
+    const snapshot = this.clientSnapshots.get(clientId)
 
     if (!snapshot) {
       return null
@@ -89,8 +89,8 @@ export class RateLimiter {
   /**
    * Manually reset a client's rate limit
    */
-  resetClient(clientIp: string): void {
-    this.clientSnapshots.delete(clientIp)
+  resetClient(clientId: string): void {
+    this.clientSnapshots.delete(clientId)
   }
 
   /**
@@ -132,9 +132,9 @@ export class RateLimiter {
    */
   private cleanup(): void {
 
-    for (const [ip, snapshot] of this.clientSnapshots.entries()) {
+    for (const [id, snapshot] of this.clientSnapshots.entries()) {
       if (snapshot.isWindowExpired(this.windowInMinutes)) {
-        this.clientSnapshots.delete(ip)
+        this.clientSnapshots.delete(id)
       }
     }
 

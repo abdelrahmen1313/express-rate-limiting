@@ -17,9 +17,7 @@ const rateLimiter = createRateLimiterMiddleware({
   // Custom key extractor
   getClientId: (req: Request) => {
     return (
-      (req.headers["cf-connecting-ip"] as string) ||
-      (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
-      req.socket?.remoteAddress || req.ip
+      crypto.randomUUID()
     )
   },
 

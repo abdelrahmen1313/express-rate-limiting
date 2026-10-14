@@ -39,7 +39,7 @@ export class ClientSnapshot implements IClientSnapshot {
    * Check if this client has exceeded the rate limit
    */
   isRateLimited(): boolean {
-    return this.hits >= this.maxHits
+    return this.hits > this.maxHits
   }
 
   /**

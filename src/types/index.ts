@@ -31,6 +31,8 @@ export interface RateLimiterConfig {
   showInformativeHeaders?: boolean
   /** Maximum clients allowed per route  (default is 9999)*/
   maxClients?: number
+  /** custom method to assign a client key (id) */
+  getClientId?: (req: Request) => string
 }
 
 /**
@@ -53,7 +55,7 @@ export type RateLimitMiddleware = (req: Request, res: Response, next: NextFuncti
 export interface MiddlewareOptions extends RateLimiterConfig {
   /** Function to determine if a request should skip rate limiting */
   skip?: (req: Request) => boolean,
-  getClientId?: (req: Request) => string
+
 
 }
 

@@ -29,9 +29,9 @@ export function createRateLimiterMiddleware(config: MiddlewareOptions): RateLimi
 
 
 
-  // using ip address as default client id (if no config.getClientId() is provided)
-  const _getClientId = (req: Request): string | undefined => {
-    return (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || req.socket?.remoteAddress || req.ip
+  // using random uuid as default.
+  const _getClientId = (req: Request): string => {
+    return crypto.randomUUID()
   }
 
   const getClientId = config.getClientId || _getClientId
@@ -44,10 +44,8 @@ export function createRateLimiterMiddleware(config: MiddlewareOptions): RateLimi
       return next()
     }
 
-
     if (rateLimiter.flagUserOverload()) {
       console.warn(`[RATE LIMITER - ROUTE OVERLOAD FLAGGED] at ${req.url}`);
-      res.status(403).end();
       return;
     }
 
@@ -55,11 +53,6 @@ export function createRateLimiterMiddleware(config: MiddlewareOptions): RateLimi
 
     const clientId = getClientId(req)
 
-    if (!clientId) {
-      console.warn("[RateLimiter] Could not determine client IP")
-      res.status(500).end();
-      return;
-    }
 
 
     const { status } = rateLimiter.checkRateLimit(clientId)

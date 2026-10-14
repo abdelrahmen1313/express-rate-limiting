@@ -4,37 +4,10 @@ A production-ready, type-safe rate limiter middleware for Express.js application
 
 ## Features
 
-- ✅ **Type - Safe**
+- Type-Safe
+- Accepts custom client ids
+- Cleanup enabled
 
- -Full TypeScript support with comprehensive types
-
-- ✅ **Lightweight**
-
-  -Minimal dependencies, only requires Express
-
-- ✅ **Flexible**
-
-  -Configurable time windows and request limits
-
-- ✅ **Memory Efficient**
-
-  -Automatic cleanup of expired entries
-
-- ✅ **Proxy Support**
-
-  -Handles `X-Forwarded-For` headers and custom IP extraction
-
-- ✅ **Standards Compliant**
-
-  -Returns standard rate limit headers(`X-RateLimit-*`)
-
-- ✅ **Per - Route Control**
-
-  -Apply to specific routes or globally
-
-- ✅ **Observable**
-
-  -Access rate limit status in downstream handlers
 
 ## Installation
 
@@ -98,9 +71,9 @@ app.use(rateLimiter);
 const rateLimiter = createRateLimiterMiddleware({
     maxRequests: 50, windowInMinutes: 5, errorMessage: "API rate limit exceeded. Please wait before making more requests.",
 
-    // Custom IP extractor for cloud environments
-    getClientIp: (req : Request) => {
-        return ((req.headers["cf-connecting-ip"]as string) || // Cloudflare
+    // Custom key extractor
+    getClientId: (req : Request) => {
+        return ((req.headers["cf-connecting-ip"]as string) || 
                 (req.headers["x-forwarded-for"]as string)
             ?.split(",")[0]
                 ?.trim() || req.socket
@@ -175,13 +148,7 @@ X - RateLimit - Reset : 1702123456
 }
 ```
 
-## How It Works
 
-1. **Request arrives** - Middleware extracts client IP
-2. **Check storage** - Looks up client's current snapshot
-3. **Validate window** - If window expired, creates new snapshot; otherwise increments hits
-4. **Check limit** - Compares hits against maxRequests
-5. **Response** - Returns 429 if limited, otherwise adds headers and continues
 
 ## Memory Management
 
